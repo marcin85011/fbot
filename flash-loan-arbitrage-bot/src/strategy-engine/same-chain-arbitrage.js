@@ -228,11 +228,30 @@ export class SameChainArbitrage {
       this.lastUpdate = new Date();
       this.metrics.opportunitiesDetected += detectedOpportunities.length;
       
+      // Log detailed opportunity information
+      for (const opportunity of detectedOpportunities) {
+        this.logger.info('🔍 Arbitrage Opportunity Detected', {
+          id: opportunity.id,
+          pair: opportunity.pair,
+          chain: opportunity.chain,
+          priceDelta: opportunity.priceDelta,
+          volume: opportunity.volume,
+          gasPrice: opportunity.gasPrice,
+          estimatedProfit: opportunity.estimatedProfit,
+          profitPercent: ((opportunity.estimatedProfit / opportunity.volume) * 100).toFixed(4),
+          buyToken: opportunity.buyToken,
+          sellToken: opportunity.sellToken,
+          buyPrice: opportunity.buyPrice,
+          sellPrice: opportunity.sellPrice,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       // Execute best opportunities if profitable
       await this.executeOpportunities(detectedOpportunities.slice(0, 3)); // Top 3 opportunities
       
       const duration = Date.now() - startTime;
-      this.logger.debug('🔍 Opportunity detection completed', { 
+      this.logger.info('🔍 Opportunity detection completed', { 
         opportunities: detectedOpportunities.length,
         viableChains: viableChains.length,
         duration: `${duration}ms`,
@@ -274,10 +293,21 @@ export class SameChainArbitrage {
       const avgPrice = (priceA + priceB) / 2;
       const priceDiffPercent = (priceDelta / avgPrice) * 100;
       
-      // Skip if price difference is too small
-      if (priceDiffPercent < 0.1) {
+      // Skip if price difference is too small (reduced threshold for demo)
+      if (priceDiffPercent < 0.01) {
         return null;
       }
+      
+      // Log all analyzed pairs for debugging
+      this.logger.debug('📊 Analyzed pair', {
+        pair: pair.symbol,
+        chain,
+        priceA,
+        priceB,
+        priceDelta,
+        priceDiffPercent: priceDiffPercent.toFixed(4),
+        minVolumeCheck: minVolume >= pair.minVolume
+      });
       
       // Determine trade direction
       const buyToken = priceA < priceB ? pair.tokenA : pair.tokenB;
@@ -356,6 +386,22 @@ export class SameChainArbitrage {
           });
           continue;
         }
+        
+        // Log detailed profit estimation breakdown
+        this.logger.info('💰 Executing Arbitrage Opportunity', {
+          id: opportunity.id,
+          pair: opportunity.pair,
+          chain: opportunity.chain,
+          estimatedProfit: opportunity.estimatedProfit,
+          profitPercent: opportunity.profitPercent,
+          confidence: opportunity.confidence,
+          costs: opportunity.costs,
+          recommendation: opportunity.recommendation,
+          volume: opportunity.volume,
+          priceDelta: opportunity.priceDelta,
+          gasPrice: opportunity.gasPrice,
+          timestamp: new Date().toISOString()
+        });
         
         // Execute the arbitrage
         await this.executeArbitrage(opportunity);

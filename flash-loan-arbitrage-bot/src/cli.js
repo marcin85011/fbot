@@ -130,7 +130,10 @@ For more information, visit: https://github.com/marcin85011/fbot
       // Set environment variables based on CLI args
       if (config.simulationMode) {
         process.env.ARBITRAGE_SIMULATION = 'true';
-        process.env.COINGECKO_MCP_SIMULATION = 'true';
+        // Only set CoinGecko simulation if not explicitly disabled
+        if (!process.env.COINGECKO_MCP_SIMULATION || process.env.COINGECKO_MCP_SIMULATION !== 'false') {
+          // Keep existing value if explicitly set to false for live prices
+        }
       }
 
       if (config.verbose) {
