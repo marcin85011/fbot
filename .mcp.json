@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {}
+    },
+    "coingecko-official": {
+      "command": "npx",
+      "args": ["-y", "@coingecko/coingecko-mcp"],
+      "env": {}
+    },
+    "web3-mcp-working": {
+      "command": "node",
+      "args": ["/mnt/d/Ebay/web3-mcp/build/index.js"],
+      "env": {
+        "SOLANA_ENABLED": "true",
+        "ETHEREUM_ENABLED": "true", 
+        "BSC_ENABLED": "true",
+        "POLYGON_ENABLED": "true",
+        "COINGECKO_ENABLED": "true"
+      }
+    }
+  }
+}
